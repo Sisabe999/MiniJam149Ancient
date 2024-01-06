@@ -35,7 +35,15 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
         }
+        Init();
+    }
+
+    private void Init()
+    {
         timeLine = TIMELINELIMIT - 1;
+        actualStatus = GameStatus.RUNNING;
+        gameSpeed = 1f;
+        points = 0;
     }
 
     public void SetGameStatus(GameStatus newStatus)
