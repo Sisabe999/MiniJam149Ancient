@@ -1,3 +1,4 @@
+using DG.Tweening;
 using MoreMountains.Tools;
 using System;
 using System.Collections;
@@ -26,11 +27,13 @@ public class UIManager : MonoBehaviour
 
     public void SetConsoleVisibility(bool visible, Action callback)
     {
-        
+        DOTween.ToAlpha(() => fadeScreen.color, x => fadeScreen.color = x, visible ? 1 : 0, 1);
+        Vector3 endPosition = consoleScreen.transform.position + (visible ? Vector3.up * 20f : Vector3.down * 20f);
+        consoleScreen.transform.DOMove(endPosition, 1f).onComplete += () => callback?.Invoke();
     }
 
     public void ShowGameOver()
     {
-
+        
     }
 }

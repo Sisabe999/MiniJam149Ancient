@@ -7,12 +7,13 @@ using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour
 {
+    [Header("Fade dependency")]
     [SerializeField] private Image fadeBackground;
 
     [ContextMenu("Fade")]
     public void PlayGame()
     {
-        //SFX
+        AudioManager.instance.Play("MenuButton");
         LoadScene();   
     }
 
