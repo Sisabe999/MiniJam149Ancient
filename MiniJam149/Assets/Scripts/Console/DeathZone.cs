@@ -10,6 +10,6 @@ public class DeathZone : MonoBehaviour
     {
         Destroy(collision.gameObject);
 
-        activityHandler.ActivityFinished();
+        activityHandler.ActivityLose();
     }
 }

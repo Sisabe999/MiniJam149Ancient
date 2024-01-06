@@ -9,11 +9,15 @@ public class ActivityHandler : MonoBehaviour
     [SerializeField] private Transform[] keyPositions;
     [SerializeField] private SymbolBehavior[] symbolsPrefabs;
 
-    private HashSet<GameObject> spawnedSymbols = new HashSet<GameObject>();
+    private HashSet<SymbolBehavior> spawnedSymbols = new HashSet<SymbolBehavior>();
 
     private float velocity;
 
     private HashSet<SymbolBehavior> checkList = new HashSet<SymbolBehavior>();
+
+    private Coroutine gameCycleCoroutine;
+
+    private bool spawnFinishedFlag;
 
     private void Update()
     {
@@ -22,9 +26,11 @@ public class ActivityHandler : MonoBehaviour
 
     public void StartGame(float speed)
     {
+        spawnFinishedFlag = false;
+        
         velocity = speed;
 
-        StartCoroutine(GameCycle());
+        gameCycleCoroutine = StartCoroutine(GameCycle());
     }
 
     private void GenerateKey()
@@ -34,7 +40,7 @@ public class ActivityHandler : MonoBehaviour
         SymbolBehavior symbol = Instantiate(symbolsPrefabs[randomSymbol], keyPositions[randomSymbol].position, Quaternion.identity);
         symbol.Initialize(velocity, randomSymbol);
 
-        spawnedSymbols.Add(symbol.gameObject);
+        spawnedSymbols.Add(symbol);
     }
 
     private IEnumerator GameCycle()
@@ -53,6 +59,9 @@ public class ActivityHandler : MonoBehaviour
 
             yield return new WaitForSeconds(spawnTimer);
         }
+
+        spawnFinishedFlag = true;
+
     }
 
     private void CheckButtonPressed()
@@ -61,65 +70,102 @@ public class ActivityHandler : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                SymbolBehavior item = checkList.Where(x => x.ID.Equals(0)).First();
+                var searchFilter = checkList.Where(x => x.ID.Equals(0));
 
-                if(item != null)
+                if (searchFilter.Count() > 0)
                 {
+                    SymbolBehavior item = searchFilter.First();
                     AudioManager.instance.Play("Symbol 1");
                     checkList.Remove(item);
+                    spawnedSymbols.Remove(item);
+
+                    if (spawnFinishedFlag && spawnedSymbols.Count == 0)
+                    {
+                        Invoke(nameof(ActivityFinished), 2f);
+                        AudioManager.instance.Play("Win");
+                    }
+
                     Destroy(item.gameObject);
                 }
                 else
                 {
-                    ActivityFinished(); 
+                    ActivityLose(); 
                 }
             }
 
             if (Input.GetKeyDown(KeyCode.W))
             {
-                SymbolBehavior item = checkList.Where(x => x.ID.Equals(1)).First();
+                var searchFilter = checkList.Where(x => x.ID.Equals(1));
 
-                if (item != null)
+                if (searchFilter.Count() > 0)
                 {
+                    SymbolBehavior item = searchFilter.First();
                     AudioManager.instance.Play("Symbol 2");
                     checkList.Remove(item);
+                    spawnedSymbols.Remove(item);
+
+                    if (spawnFinishedFlag && spawnedSymbols.Count == 0)
+                    {
+                        Invoke(nameof(ActivityFinished), 2f);
+                        AudioManager.instance.Play("Win");
+                    }
+
                     Destroy(item.gameObject);
                 }
                 else
                 {
-                    ActivityFinished();
+                    ActivityLose();
                 }
             }
 
             if (Input.GetKeyDown(KeyCode.E))
             {
-                SymbolBehavior item = checkList.Where(x => x.ID.Equals(2)).First();
+                var searchFilter = checkList.Where(x => x.ID.Equals(2));
 
-                if (item != null)
+                if (searchFilter.Count() > 0)
                 {
+                    SymbolBehavior item = searchFilter.First();
                     AudioManager.instance.Play("Symbol 3");
                     checkList.Remove(item);
+                    spawnedSymbols.Remove(item);
+
+                    if(spawnFinishedFlag && spawnedSymbols.Count == 0)
+                    {
+                        Invoke(nameof(ActivityFinished), 2f);
+                        AudioManager.instance.Play("Win");
+                    }
+
                     Destroy(item.gameObject);
                 }
                 else
                 {
-                    ActivityFinished();                    
+                    ActivityLose();                    
                 }
             }
 
             if (Input.GetKeyDown(KeyCode.R))
             {
-                SymbolBehavior item = checkList.Where(x => x.ID.Equals(3)).First();
+                var searchFilter = checkList.Where(x => x.ID.Equals(3));
 
-                if (item != null)
+                if (searchFilter.Count() > 0)
                 {
+                    SymbolBehavior item = searchFilter.First();
                     AudioManager.instance.Play("Symbol 4");
                     checkList.Remove(item);
+                    spawnedSymbols.Remove(item);
+
+                    if (spawnFinishedFlag && spawnedSymbols.Count == 0)
+                    {
+                        Invoke(nameof(ActivityFinished), 2f);
+                        AudioManager.instance.Play("Win");
+
+                    }
+
                     Destroy(item.gameObject);
                 }
                 else
                 {
-                    ActivityFinished();
+                    ActivityLose();
                 }
             }
         }
@@ -139,18 +185,31 @@ public class ActivityHandler : MonoBehaviour
         checkList.Remove(symbol);
     }
 
-    public void ActivityFinished()
+    public void ActivityLose()
     {
-        foreach (GameObject s in spawnedSymbols)
+        StopCoroutine(gameCycleCoroutine);
+
+        gameCycleCoroutine = null;
+
+        AudioManager.instance.Play("Lose");
+
+        foreach (SymbolBehavior s in spawnedSymbols)
         {
+            s.StopSymbol();
+
             s.transform.DOScale(Vector3.zero, 1.5f).onComplete += () =>
             {
-                Destroy(s);
+                Destroy(s.gameObject);
             };
         }
 
         spawnedSymbols.Clear();
 
         GameManager.Instance.SendActivityState(false);
+    }
+
+    private void ActivityFinished()
+    {
+        GameManager.Instance.SendActivityState(true);
     }
 }

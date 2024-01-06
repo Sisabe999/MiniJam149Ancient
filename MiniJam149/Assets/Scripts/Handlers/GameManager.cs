@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
     {
         timeLine = TIMELINELIMIT - 1;
         actualStatus = GameStatus.RUNNING;
-        gameSpeed = 1f;
+        gameSpeed = 2f;
         points = 0;
     }
 
@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
         }
         uiManager.SetUI(timeLine, points);
     }
-
+    [ContextMenu("startsito")]
     public void StartActivity()
     {
         if (actualStatus != GameStatus.RUNNING)

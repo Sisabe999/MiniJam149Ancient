@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 public class SymbolBehavior : MonoBehaviour
 {
 
-    public float velocity;
+    private float velocity;
     public int ID;
 
     public void Initialize(float speed, int id)
@@ -19,5 +19,10 @@ public class SymbolBehavior : MonoBehaviour
     private void Update()
     {
          transform.Translate(Vector2.down * velocity * Time.deltaTime);
+    }
+
+    public void StopSymbol()
+    {
+        velocity = 0;
     }
 }
