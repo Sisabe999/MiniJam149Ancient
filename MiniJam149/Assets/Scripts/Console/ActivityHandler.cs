@@ -15,6 +15,11 @@ public class ActivityHandler : MonoBehaviour
 
     private HashSet<SymbolBehavior> checkList = new HashSet<SymbolBehavior>();
 
+    private void Update()
+    {
+        CheckButtonPressed();
+    }
+
     public void StartGame(float speed)
     {
         velocity = speed;
@@ -60,11 +65,13 @@ public class ActivityHandler : MonoBehaviour
 
                 if(item != null)
                 {
-
+                    AudioManager.instance.Play("Symbol 1");
+                    checkList.Remove(item);
+                    Destroy(item.gameObject);
                 }
                 else
                 {
-                    //Call GameManager to SetActivityState as false
+                    ActivityFinished(); 
                 }
             }
 
@@ -74,11 +81,13 @@ public class ActivityHandler : MonoBehaviour
 
                 if (item != null)
                 {
-
+                    AudioManager.instance.Play("Symbol 2");
+                    checkList.Remove(item);
+                    Destroy(item.gameObject);
                 }
                 else
                 {
-                    //Call GameManager to SetActivityState as false
+                    ActivityFinished();
                 }
             }
 
@@ -88,11 +97,13 @@ public class ActivityHandler : MonoBehaviour
 
                 if (item != null)
                 {
-
+                    AudioManager.instance.Play("Symbol 3");
+                    checkList.Remove(item);
+                    Destroy(item.gameObject);
                 }
                 else
                 {
-                    //Call GameManager to SetActivityState as false
+                    ActivityFinished();                    
                 }
             }
 
@@ -102,11 +113,13 @@ public class ActivityHandler : MonoBehaviour
 
                 if (item != null)
                 {
-
+                    AudioManager.instance.Play("Symbol 4");
+                    checkList.Remove(item);
+                    Destroy(item.gameObject);
                 }
                 else
                 {
-                    //Call GameManager to SetActivityState as false
+                    ActivityFinished();
                 }
             }
         }
@@ -126,7 +139,7 @@ public class ActivityHandler : MonoBehaviour
         checkList.Remove(symbol);
     }
 
-    private void ActivityFinished()
+    public void ActivityFinished()
     {
         foreach (GameObject s in spawnedSymbols)
         {
@@ -137,5 +150,7 @@ public class ActivityHandler : MonoBehaviour
         }
 
         spawnedSymbols.Clear();
+
+        GameManager.Instance.SendActivityState(false);
     }
 }
